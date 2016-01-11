@@ -53,6 +53,8 @@
         <property name="lib.dir" value="WebContent/WEB-INF/lib" />
         <property name="web.dir" value="." />
         <property name="webcontent.dir" value="WebContent" />
+    	<property name="xjc.package" value="introsde.finalproject.rest.generated" />
+    	
         <!-- ================================= 
 	          target: resolve downloads the dependencies to your lib folder              
 	         ================================= -->
@@ -110,8 +112,8 @@
         </target>
 
         <target name="start">
-            <echo message="app start introsde.rest.ehealth.App in ${build.dir}" />
-            <java classname="introsde.rest.ehealth.App" classpath="${build.dir}" fork="true">
+            <echo message="app start introsde.finalproject.rest.bls.App in ${build.dir}" />
+            <java classname="introsde.finalproject.rest.bls.App" classpath="${build.dir}" fork="true">
                 <arg value="$JAVA_OPTS  -cp" />
                 <classpath>
                     <path location="build" />
@@ -122,7 +124,13 @@
                 </classpath>
             </java>
         </target>
-
+		
+    	<target name="generate" depends="init">
+    	    <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask" classpathref="lib.path.id">
+    	    </taskdef>
+    	    <xjc schema="user.xsd" destdir="${src.dir}" package="${xjc.package}" />
+    	</target>
+    	
         <!-- Run the JUnit Tests -->
         <!-- Output is XML, could also be plain-->
         <target name="junit">
