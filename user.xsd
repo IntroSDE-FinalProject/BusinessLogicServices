@@ -12,7 +12,7 @@
 			<xs:element name="fiscalcode" type="xs:string" minOccurs="0"/>
 			<xs:element name="gender" type="genderType"/>
 			<xs:element name="Measurements" type="listMeasureType" minOccurs="0"/>
-			<xs:element name="doctor" type="doctorType" minOccurs="0"/>
+			<xs:element name="doctor" type="doctorType" minOccurs="0" />
 			<xs:element name="Targets" type="listTargetType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
@@ -30,12 +30,12 @@
 			<xs:element name="firstname" type="xs:string"/>
 			<xs:element name="lastname" type="xs:string"/>
 			<xs:element name="specialization" type="xs:string"/>
-			<xs:element name="city" type="xs:string"/>
+			<xs:element name="city" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="listMeasureType">
 		<xs:sequence>
-			<xs:element name="measure" type="measureType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="measure" type="measureType" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="measureType">
@@ -48,7 +48,7 @@
 	</xs:complexType>
 	<xs:complexType name="listTargetType">
 		<xs:sequence>
-			<xs:element name="target" type="targetType" maxOccurs="unbounded" minOccurs="0"/>
+			<xs:element name="target" type="targetType" maxOccurs="unbounded" minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="targetType">
@@ -59,7 +59,7 @@
 			<xs:element name="startDateTarget" type="xs:string"/>
 			<xs:element name="endDateTarget" type="xs:string"/>
 			<xs:element name="conditionTarget" type="xs:string"/>
-			<xs:element name="achieved" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="achieved" type="xs:boolean"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="listReminderType">
@@ -79,11 +79,11 @@
 	</xs:complexType>
 	<xs:complexType name="measureDefinitionType">
 		<xs:sequence>
-			<xs:element name="idMeasureDefinition" type="xs:integer"/>
+			<xs:element name="idMeasureDef" type="xs:integer"/>
 			<xs:element name="measureName" type="xs:string"/>
 			<xs:element name="measureType" type="xs:string" minOccurs="0"/>
-			<xs:element name="startValue" type="xs:string" minOccurs="0"/>
-			<xs:element name="endValue" type="xs:string" minOccurs="0"/>
+			<xs:element name="startValue" type="xs:string" minOccurs="0" />
+			<xs:element name="endValue" type="xs:string" minOccurs="0" />
 			<xs:element name="alarmLevel" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
