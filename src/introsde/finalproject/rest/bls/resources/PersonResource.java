@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.client.ClientConfig;
+import org.json.JSONObject;
 
 import introsde.finalproject.rest.generated.*;
 
@@ -303,6 +304,18 @@ public class PersonResource {
         
         
         String jsonWeather = response_weather.readEntity(String.class);
+        JSONObject weather_data = new JSONObject(jsonWeather);
+        
+        System.out.println("Content of weather data: " + weather_data);
+        String condition = weather_data.get("Condition").toString();
+        String pressure = weather_data.get("Pressure").toString();
+        String humidity = weather_data.get("Humidity").toString();
+        String temp_min = weather_data.get("Temperature min").toString();
+        String temp_max = weather_data.get("Temperature max").toString();
+        
+        
+        
+        
         
         if(response_weather.getStatus() != 200){
         	System.out.println("Error in external service");
