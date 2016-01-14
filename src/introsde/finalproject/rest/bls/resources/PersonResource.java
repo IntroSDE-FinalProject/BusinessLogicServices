@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.ejb.LocalBean;
@@ -192,7 +193,7 @@ public class PersonResource {
 	@GET
 	@Path("/motivation")
 	@Produces( MediaType.APPLICATION_JSON )
-	public Response  getMotivation(){
+	public Response getMotivation(){
 		try{
 		System.out.println("visualizeSuggestion: Reading suggestion for idPerson "+ this.idPerson +"...");
 		String path_motivation = "services/quote";
@@ -203,35 +204,46 @@ public class PersonResource {
         //AS ---> Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 		//.entity("Error AS").build();
         
-        String jsonGetRandom = response_motivation.readEntity(String.class);
+        String motivation_quote = response_motivation.readEntity(String.class);
         if(response_motivation.getStatus() != 200){
         	System.out.println("SS Error response_motivation.getStatus() != 200  ");
          return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-    				.entity(externalErrorMessage(jsonGetRandom)).build();
+    				.entity(externalErrorMessage(motivation_quote)).build();
          
          }else{
-        	 Date date_create_reminder = Calendar.getInstance().getTime();
-        	 DateFormat date_created = new SimpleDateFormat("yyyy-MM-dd");
-        	 date_created.format(date_create_reminder);
-        	 int year_created;
-        	 int months_created;
-        	 int days_created;
-        	 
-        	 
-        	 
-        	 Date date_expire_reminder = Calendar.getInstance().getTime();
-        	 date_expire_reminder.setMonth(months_created+5);
-        	 DateFormat date_expired = new SimpleDateFormat("yyyy-MM-dd");
-        	 date_expired.format(date_expire_reminder);
-        	 
+        	 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MMM-dd");
+             Calendar cal_created = Calendar.getInstance();
+             //System.out.println(dateFormat.format(cal.getTime()));
+             String date_created = dateFormat.format(cal_created.getTime());
+             //System.out.println(date_created.getClass().getName());
+             
+             int years = cal_created.get(Calendar.YEAR);
+             int days = cal_created.get(Calendar.DAY_OF_MONTH);
+             int month = cal_created.get(Calendar.MONTH);
+             
+             //Calendar for expired date with the days setted to 5 days after respect to the creation
+             Calendar cal_expired =  cal_created;
+             //update a date
+             int days_expired = days+5;
+             cal_expired.set(years, month, days_expired);
+             String date_expired = dateFormat.format(cal_expired.getTime());
+             
+             int relevance_value = 3;
+             BigInteger relevance = BigInteger.valueOf(relevance_value);
         	 
         	 ReminderType quote_reminder = new ReminderType();
         	 quote_reminder.setAutocreate(true);
-        	 quote_reminder.setCreateReminder(value);
-        	 return Response.ok(jsonGetRandom).build();
+        	 quote_reminder.setCreateReminder(date_created);
+        	 quote_reminder.setExpireReminder(date_expired);
+        	 quote_reminder.setRelevanceLevel(relevance);
+        	 quote_reminder.setText(motivation_quote);
+        	 insertNewReminder(quote_reminder);
+        	 
+        	 return Response.ok(motivation_quote).build();
+        	 
          }
         }catch(Exception e){
-        	System.out.println("SS Error catch response_motivation.getStatus() != 200  ");
+        	System.out.println("BLS Error catch response_motivation.getStatus() != 200  ");
         	return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 			.entity(errorMessage(e)).build();
         }
@@ -301,10 +313,13 @@ public class PersonResource {
 	//********************TARGET********************
 
 	/**
-	 * POST /person/{personId}/target/check
+	 * GET /person/{personId}/target/check
 	 * 	checkTarget(Measure) --> Boo
+	 * 
+	 * Check if the target is achieved for the measure passed as param
+	 * 
 	 */
-	@POST
+	@GET
 	@Path("/target/check")
 	@Produces( MediaType.APPLICATION_JSON )
 	public Boolean checkTarget() {
