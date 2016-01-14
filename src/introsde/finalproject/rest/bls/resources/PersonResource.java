@@ -62,6 +62,16 @@ public class PersonResource {
 		this.mediaType = mediatype;
 		this.path = "person/"+this.idPerson;
 	}
+	
+	
+	private String errorMessage(Exception e){
+    	return "{ \n \"error\" : \"Error in Storage Services, due to the exception: "+e+"\"}";
+    }
+	
+	private String externalErrorMessage(String e){
+    	return "{ \n \"error\" : \"Error in External services, due to the exception: "+e+"\"}";
+    }
+	
 
 	//********************PERSON********************
 
@@ -172,15 +182,93 @@ public class PersonResource {
 	 * @return
 	 */
 	@GET
-	@Path("/suggestion")
+	@Path("/motivation")
 	@Produces( MediaType.APPLICATION_JSON )
-	public ReminderType  visualizeSuggestion(){
+	public Response  getMotivation(){
+		try{
+		System.out.println("visualizeSuggestion: Reading suggestion for idPerson "+ this.idPerson +"...");
+		String path_motivation = "services/quote";
+        System.out.println("Service to string" + service.toString());
+        Response response_motivation = service.path(path_motivation).request().accept(MediaType.TEXT_PLAIN_TYPE).get(Response.class);
+        System.out.print("Response: " + response_motivation);
+	
+        //AS ---> Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+		//.entity("Error AS").build();
+        
+        String jsonGetRandom = response_motivation.readEntity(String.class);
+        if(response_motivation.getStatus() != 200){
+        	System.out.println("SS Error response_motivation.getStatus() != 200  ");
+         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    				.entity(externalErrorMessage(jsonGetRandom)).build();
+         
+         }else{
+        	 Date date_create_reminder = Calendar.getInstance().getTime();
+        	 DateFormat date_created = new SimpleDateFormat("yyyy-MM-dd");
+        	 date_created.format(date_create_reminder);
+        	 int year_created;
+        	 int months_created;
+        	 int days_created;
+        	 
+        	 
+        	 
+        	 Date date_expire_reminder = Calendar.getInstance().getTime();
+        	 date_expire_reminder.setMonth(months_created+5);
+        	 DateFormat date_expired = new SimpleDateFormat("yyyy-MM-dd");
+        	 date_expired.format(date_expire_reminder);
+        	 
+        	 
+        	 ReminderType quote_reminder = new ReminderType();
+        	 quote_reminder.setAutocreate(true);
+        	 quote_reminder.setCreateReminder(value);
+        	 return Response.ok(jsonGetRandom).build();
+         }
+        }catch(Exception e){
+        	System.out.println("SS Error catch response_motivation.getStatus() != 200  ");
+        	return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			.entity(errorMessage(e)).build();
+        }
+	
+	}
+	
+	
+	
+	/**
+	 * GET /person/{personId}/suggestion
+	 * @return
+	 */
+	@GET
+	@Path("/weather")
+	@Produces( MediaType.APPLICATION_JSON )
+	public ReminderType  getWeather(){
 		System.out.println("visualizeSuggestion: Reading suggestion for idPerson "+ this.idPerson +"...");
 
 		//TODO da finire
 
 		return null;
 	}
+	
+	
+	
+	/**
+	 * GET /person/{personId}/suggestion
+	 * @return
+	 */
+	@GET
+	@Path("/forecast")
+	@Produces( MediaType.APPLICATION_JSON )
+	public ReminderType  getForecast(){
+		System.out.println("visualizeSuggestion: Reading suggestion for idPerson "+ this.idPerson +"...");
+
+		//TODO da finire
+
+		return null;
+	}
+	
+	
+	
+	
+	
+	
 
 	/**
 	 * POST /person/{personId}/reminder
