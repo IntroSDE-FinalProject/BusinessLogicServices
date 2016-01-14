@@ -1,6 +1,7 @@
 package introsde.finalproject.rest.bls.resources;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -12,6 +13,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -25,6 +27,13 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.glassfish.jersey.client.ClientConfig;
+
+import introsde.finalproject.rest.generated.ListMeasureDefinitionType;
+import introsde.finalproject.rest.generated.ListMeasureType;
+import introsde.finalproject.rest.generated.ListTargetType;
+import introsde.finalproject.rest.generated.MeasureDefinitionType;
+import introsde.finalproject.rest.generated.MeasureType;
+import introsde.finalproject.rest.generated.ReminderType;
 
 @Stateless // will work only inside a Java EE application
 @LocalBean // will work only inside a Java EE application
@@ -78,4 +87,25 @@ public class CollectionResources {
 		 return new FamilyResource(uriInfo, request, id, service, mediaType);
 	 }
 	 
+	 /**
+	  * GET /measureDefinition
+	  * Return the measureDefinition object associated with a specific id
+	  * @return {@link MeasureDefinitionType} 
+	  */
+	 @GET
+	 @Path("/measureDefinition")
+	 @Produces( MediaType.APPLICATION_JSON )
+	 public MeasureDefinitionType readTargets(@QueryParam("measure") BigInteger measureId) {
+		 System.out.println("readTargets: Readind Measure Definition");
+		 Response response = service.path("/measureDefinition").request().accept(mediaType).get(Response.class);
+		 System.out.println(response);
+		 ListMeasureDefinitionType ld = response.readEntity(ListMeasureDefinitionType.class);
+		 MeasureDefinitionType result = null;
+		 for(MeasureDefinitionType de : ld.getMeasureType()){
+			 if(de.getIdMeasureDef().compareTo(measureId) == 0){
+				 result = de;
+			 }
+		 }
+		 return result;
+	 }
 }
