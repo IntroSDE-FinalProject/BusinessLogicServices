@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.ejb.LocalBean;
@@ -22,6 +23,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
@@ -29,6 +33,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+import org.glassfish.jersey.client.ClientConfig;
 
 import introsde.finalproject.rest.generated.*;
 
@@ -62,6 +68,16 @@ public class PersonResource {
 		this.mediaType = mediatype;
 		this.path = "person/"+this.idPerson;
 	}
+	
+	
+	private String errorMessage(Exception e){
+    	return "{ \n \"error\" : \"Error in Storage Services, due to the exception: "+e+"\"}";
+    }
+	
+	private String externalErrorMessage(String e){
+    	return "{ \n \"error\" : \"Error in External services, due to the exception: "+e+"\"}";
+    }
+	
 
 	//********************PERSON********************
 
@@ -124,6 +140,8 @@ public class PersonResource {
 		System.out.println("visualizeMeasure: Reading Measures for idPerson "+ this.idPerson +"...");
 		Response response = service.path(path+"/measure").request().accept(mediaType).get(Response.class);
 		System.out.println(response);
+		//ListMeasureType x = response.readEntity(ListMeasureType.class);
+		//x.getMeasure().get(0).getTimestamp();
 		return response.readEntity(ListMeasureType.class);
 	}
 
@@ -178,15 +196,185 @@ public class PersonResource {
 	 * @return
 	 */
 	@GET
-	@Path("/suggestion")
+	@Path("/motivation")
 	@Produces( MediaType.APPLICATION_JSON )
-	public ReminderType  visualizeSuggestion(){
+	public Response getMotivation(){
+		try{
 		System.out.println("visualizeSuggestion: Reading suggestion for idPerson "+ this.idPerson +"...");
-
-		//TODO da finire
-
-		return null;
+		String path_motivation = "services/quote";
+        System.out.println("Service to string" + service.toString());
+        Response response_motivation = service.path(path_motivation).request().accept(MediaType.TEXT_PLAIN_TYPE).get(Response.class);
+        System.out.print("Response: " + response_motivation);
+	
+        //AS ---> Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+		//.entity("Error AS").build();
+        
+        String motivation_quote = response_motivation.readEntity(String.class);
+        if(response_motivation.getStatus() != 200){
+        	System.out.println("SS Error response_motivation.getStatus() != 200  ");
+         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    				.entity(externalErrorMessage(motivation_quote)).build();
+         
+         }else{
+        	 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MMM-dd");
+             Calendar cal_created = Calendar.getInstance();
+             //System.out.println(dateFormat.format(cal.getTime()));
+             String date_created = dateFormat.format(cal_created.getTime());
+             //System.out.println(date_created.getClass().getName());
+             
+             int years = cal_created.get(Calendar.YEAR);
+             int days = cal_created.get(Calendar.DAY_OF_MONTH);
+             int month = cal_created.get(Calendar.MONTH);
+             
+             //Calendar for expired date with the days setted to 5 days after respect to the creation
+             Calendar cal_expired =  cal_created;
+             //update a date
+             int days_expired = days+5;
+             cal_expired.set(years, month, days_expired);
+             String date_expired = dateFormat.format(cal_expired.getTime());
+             
+             int relevance_value = 3;
+             BigInteger relevance = BigInteger.valueOf(relevance_value);
+        	 
+        	 ReminderType quote_reminder = new ReminderType();
+        	 quote_reminder.setAutocreate(true);
+        	 quote_reminder.setCreateReminder(date_created);
+        	 quote_reminder.setExpireReminder(date_expired);
+        	 quote_reminder.setRelevanceLevel(relevance);
+        	 quote_reminder.setText(motivation_quote);
+        	 insertNewReminder(quote_reminder);
+        	 
+        	 return Response.ok(motivation_quote).build();
+        	 
+         }
+        }catch(Exception e){
+        	System.out.println("BLS Error catch response_motivation.getStatus() != 200  ");
+        	return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			.entity(errorMessage(e)).build();
+        }
+	
 	}
+	
+	
+	
+	
+	/**
+     * This method is used to get the current weather data for one location.
+     * 
+     * GET /person/{personId}/weather
+     * 
+     * @param city location and nation code for which get current weather data
+     * @param metric type of units to use for measure
+     * @param json type of return data
+     * @return jsonWeather 
+     */
+    @GET
+    @Path("/weather")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getWeatherTest(@QueryParam("city") String city, @QueryParam("units") String metric,
+    		@QueryParam("mode") String json) {
+    	try{
+    	//http://127.0.1.1:5700/sdelab/person/weather?city=Trento,it&units=metric&mode=json
+    	ClientConfig clientConfig = new ClientConfig();
+		Client client = ClientBuilder.newClient(clientConfig);
+		//WebTarget service_weather = client.target(getBaseURIWeatherTest());
+		WebTarget service_weather = client.target("https://ss-serene-hamlet-9690.herokuapp.com/sdelab/services/weather")
+				.queryParam("city", city)
+				.queryParam("units", metric)
+				.queryParam("mode", json);
+				
+        System.out.println("City: " + city);
+        System.out.println("Metric: " + metric);
+        System.out.println("mode: " + json);
+		System.out.println("Service to string  adding path" + service_weather.toString());
+		
+		
+		
+		//this.service_weather = service_weather;
+		
+		System.out.println("Service to string  after this.service_weater adding path" + service_weather.toString());
+		
+    	//String path = "http://api.openweathermap.org/data/2.5/find?q=Trento,it&units=metric&mode=json&appid=a3dbf2f9a2ab9c24905f3ea44cb9e265";
+    	
+		Response response_weather = service_weather.request().accept(MediaType.APPLICATION_JSON).get(Response.class);
+		System.out.println("response_weather: " + response_weather );
+        //System.out.println(weather);
+        System.out.println("Service_weather after adding path: " + service_weather.toString());
+        
+        
+        String jsonWeather = response_weather.readEntity(String.class);
+        
+        if(response_weather.getStatus() != 200){
+        	System.out.println("Error in external service");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+       				.entity(externalErrorMessage(jsonWeather)).build();
+            }else{
+            	System.out.println("jsonWeather: " + jsonWeather );
+            	return Response.ok(jsonWeather).build();
+            }
+    	}catch(Exception e){
+    		System.out.print("Error Cath motivation");
+    		return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    				.entity(errorMessage(e)).build();
+    	}
+    }
+	
+	
+	
+    /**
+     * This method is used to get weather forecast for 5 days 
+     * with data every 3 hours by city name.
+     * 
+     * 
+     * @param city location and nation code for which get forecast weather data
+     * @param metric type of units to use for measure
+     * @param json type of return data
+     * @return jsonWeather
+     */
+    @GET
+    @Path("/forecast")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getForeCast(@QueryParam("city") String city, @QueryParam("units") String metric,
+    		@QueryParam("mode") String json) {
+    	try{
+    	//http://127.0.1.1:5700/sdelab/person/forecast?city=Trento,it&units=metric&mode=json
+    	
+    	//http://api.openweathermap.org/data/2.5/forecast?q=Trento,it&units=metric&mode=json&appid=2de143494c0b295cca9337e1e96b00e0
+    	ClientConfig clientConfig = new ClientConfig();
+		Client client = ClientBuilder.newClient(clientConfig);
+		//WebTarget service = client.target(getBaseURIForecast());
+		WebTarget service_forecast = client.target("https://as-enigmatic-journey-9195.herokuapp.com/sdelab/services/forecast")
+				.queryParam("city", city)
+				.queryParam("units", metric)
+				.queryParam("mode", json);
+		//this.service_forecast = service;
+		
+		
+        System.out.println("Service to string" + service_forecast.toString());
+        Response response_forecast = service_forecast.request().accept(MediaType.APPLICATION_JSON).get(Response.class);
+        String jsonForecast = response_forecast.readEntity(String.class);
+        
+        if(response_forecast.getStatus() != 200){
+        	System.out.println("Error in external service");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+       				.entity(externalErrorMessage(jsonForecast)).build();
+            }else{
+            	System.out.println("jsonGetRandom: " + jsonForecast );
+            	return Response.ok(jsonForecast).build();
+            }
+    	}catch(Exception e){
+    		System.out.print("Error Cath motivation");
+    		return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    				.entity(errorMessage(e)).build();
+    	}
+        
+    }
+	
+	
+	
+	
+	
+	
 
 	/**
 	 * POST /person/{personId}/reminder
@@ -211,10 +399,13 @@ public class PersonResource {
 	//********************TARGET********************
 
 	/**
-	 * POST /person/{personId}/target/check
+	 * GET /person/{personId}/target/check
 	 * 	checkTarget(Measure) --> Boo
+	 * 
+	 * Check if the target is achieved for the measure passed as param
+	 * 
 	 */
-	@POST
+	@GET
 	@Path("/target/check")
 	@Produces( MediaType.APPLICATION_JSON )
 	public Boolean checkTarget() {
