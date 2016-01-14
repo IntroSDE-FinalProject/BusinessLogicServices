@@ -70,4 +70,31 @@ visualizeDailyActivities(idUser) --> List, List, List
 		return null;
 	}
     
+	/**
+	 * GET /family/{familyId}/person/{personId}/alarm
+	 * @return
+	 */
+	@GET
+	@Path("/person/{personId}/alarm")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ListMeasureType receiveAlarm(@PathParam("personId") String personId) {
+		System.out.println("receiveAlarm: Check Data from person id "+personId +"...");
+		
+		//TODO finire
+		return null;
+	}
+    
+	/**
+	 * GET /family/{familyId}/person/{personId}/activities
+	 * @return
+	 */
+	@GET
+	@Path("/person/{personId}/activities")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ListMeasureType visualizeDailyActivities(@PathParam("personId") String personId) {
+		System.out.println("receiveAlarm: Check Data from person id "+personId +"...");
+		
+		//TODO finire
+		return null;
+	}
 }
