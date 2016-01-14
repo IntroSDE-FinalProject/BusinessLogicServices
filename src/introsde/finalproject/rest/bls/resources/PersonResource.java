@@ -120,6 +120,8 @@ public class PersonResource {
 		System.out.println("visualizeMeasure: Reading Measures for idPerson "+ this.idPerson +"...");
 		Response response = service.path(path+"/measure").request().accept(mediaType).get(Response.class);
 		System.out.println(response);
+		//ListMeasureType x = response.readEntity(ListMeasureType.class);
+		//x.getMeasure().get(0).getTimestamp();
 		return response.readEntity(ListMeasureType.class);
 	}
 
