@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.client.ClientConfig;
+import org.json.JSONObject;
 
 import introsde.finalproject.rest.generated.*;
 
@@ -71,7 +72,7 @@ public class PersonResource {
 	
 	
 	private String errorMessage(Exception e){
-    	return "{ \n \"error\" : \"Error in Storage Services, due to the exception: "+e+"\"}";
+    	return "{ \n \"error\" : \"Error in Business Logic Services, due to the exception: "+e+"\"}";
     }
 	
 	private String externalErrorMessage(String e){
@@ -322,14 +323,34 @@ public class PersonResource {
         
         
         String jsonWeather = response_weather.readEntity(String.class);
+        JSONObject weather_data = new JSONObject(jsonWeather);
+        
+        System.out.println("Content of weather data: " + weather_data);
+        String condition = weather_data.get("Condition").toString();
+        String pressure = weather_data.get("Pressure").toString();
+        String humidity = weather_data.get("Humidity").toString();
+        String temp_min = weather_data.get("Temperature min").toString();
+        String temp_max = weather_data.get("Temperature max").toString();
+        
+        
+        String rain = "Rain";
+        if(condition.equals(rain) != true){
+        	System.out.println("Is not raining");
+        	weather_data.put("Motivation", "Is not raining !!! Come on lets go outside to run !");
+        }else{
+        	System.out.println("Is raining");
+        	weather_data.put("Motivation", "Doesn't matter if is raining...do some exercices at home !");
+        }
+        String weather_with_motivation = weather_data.toString();
+        
         
         if(response_weather.getStatus() != 200){
         	System.out.println("Error in external service");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-       				.entity(externalErrorMessage(jsonWeather)).build();
+       				.entity(externalErrorMessage(weather_with_motivation)).build();
             }else{
-            	System.out.println("jsonWeather: " + jsonWeather );
-            	return Response.ok(jsonWeather).build();
+            	System.out.println("jsonWeather: " + weather_with_motivation );
+            	return Response.ok(weather_with_motivation).build();
             }
     	}catch(Exception e){
     		System.out.print("Error Cath motivation");
@@ -362,7 +383,7 @@ public class PersonResource {
     	ClientConfig clientConfig = new ClientConfig();
 		Client client = ClientBuilder.newClient(clientConfig);
 		//WebTarget service = client.target(getBaseURIForecast());
-		WebTarget service_forecast = client.target("https://as-enigmatic-journey-9195.herokuapp.com/sdelab/services/forecast")
+		WebTarget service_forecast = client.target("https://ss-serene-hamlet-9690.herokuapp.com/sdelab/services/weather")
 				.queryParam("city", city)
 				.queryParam("units", metric)
 				.queryParam("mode", json);
@@ -373,13 +394,36 @@ public class PersonResource {
         Response response_forecast = service_forecast.request().accept(MediaType.APPLICATION_JSON).get(Response.class);
         String jsonForecast = response_forecast.readEntity(String.class);
         
+        
+        
+        JSONObject forecast_data = new JSONObject(jsonForecast);
+        
+        System.out.println("Content of weather data: " + forecast_data);
+        String condition = forecast_data.get("Condition").toString();
+        String pressure = forecast_data.get("Pressure").toString();
+        String humidity = forecast_data.get("Humidity").toString();
+        String temp_min = forecast_data.get("Temperature min").toString();
+        String temp_max = forecast_data.get("Temperature max").toString();
+        
+        
+        String rain = "Rain";
+        if(condition.equals(rain) != true){
+        	System.out.println("Tomorrow will not rain...");
+        	forecast_data.put("Motivation", "Wowowow tomorrow will not rain !!! Be ready to do some workout !");
+        }else{
+        	System.out.println("Is raining");
+        	forecast_data.put("Motivation", "Doesn't matter if tomorrow will rain...you will be able to do some exercices at home !");
+        }
+        String forecast_with_motivation = forecast_data.toString();
+        System.out.println("Forecast with motivation: " + forecast_with_motivation);
+        
         if(response_forecast.getStatus() != 200){
         	System.out.println("Error in external service");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-       				.entity(externalErrorMessage(jsonForecast)).build();
+       				.entity(externalErrorMessage(forecast_with_motivation)).build();
             }else{
-            	System.out.println("jsonGetRandom: " + jsonForecast );
-            	return Response.ok(jsonForecast).build();
+            	System.out.println("jsonGetRandom: " + forecast_with_motivation );
+            	return Response.ok(forecast_with_motivation).build();
             }
     	}catch(Exception e){
     		System.out.print("Error Cath motivation");
