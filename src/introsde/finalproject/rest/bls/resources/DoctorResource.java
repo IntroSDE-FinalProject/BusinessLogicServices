@@ -48,7 +48,8 @@ public class DoctorResource {
     
     /**
 	 * GET /doctor/{doctorId}
-	 * @return
+	 * Return Doctor with {doctorId}
+	 * @return DoctorType a doctor
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -61,6 +62,7 @@ public class DoctorResource {
     
 	/**
 	 * DELETE /doctor/{doctorId}
+	 * Delete Doctor with {doctorId}
 	 */
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
@@ -73,9 +75,9 @@ public class DoctorResource {
 	/**
 	 * GET /doctor/{doctorId}/patients
 	 * Returns the list of patients
-	 * @return
+	 * @return ListPersonType list of person
 	 */
-	//TODO aggiugere wrapper in lds
+	//TODO da provare
 	@GET
 	@Path("/patients")
 	@Produces( MediaType.APPLICATION_JSON )

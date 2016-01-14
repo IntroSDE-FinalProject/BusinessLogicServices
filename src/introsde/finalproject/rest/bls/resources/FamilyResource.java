@@ -92,7 +92,7 @@ visualizeDailyActivities(idUser) --> List, List, List
 	@Path("/person/{personId}/activities")
 	@Produces(MediaType.APPLICATION_JSON)
 	public ListMeasureType visualizeDailyActivities(@PathParam("personId") String personId) {
-		System.out.println("receiveAlarm: Check Data from person id "+personId +"...");
+		
 		
 		//TODO finire
 		return null;
