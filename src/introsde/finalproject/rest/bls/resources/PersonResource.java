@@ -77,7 +77,8 @@ public class PersonResource {
 
 	/**
 	 * GET /person/{personId}
-	 * @return
+	 * Return Person with {personId}
+	 * @return PersonType person
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -94,6 +95,7 @@ public class PersonResource {
 
 	/**
 	 * DELETE /person/{personId}
+	 * Delete Person with {personId}
 	 */
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
@@ -107,7 +109,8 @@ public class PersonResource {
 
 	/**
 	 * GET /person/{personId}/currentHealth
-	 * @return
+	 * Return the list of the most last measurement for each MeasureDefinition
+	 * @return ListMeasureType list of measures
 	 */
 	@GET
 	@Path("/currentHealth")
@@ -121,7 +124,8 @@ public class PersonResource {
 
 	/**
 	 * GET /person/{personId}/measure
-	 * @return
+	 * Return the history of all measurement
+	 * @return ListMeasureType list of measures
 	 */
 	@GET
 	@Path("/measure")
@@ -140,7 +144,7 @@ public class PersonResource {
 	/**
 	 * GET /person/{personId}/reminder
 	 * Return all not expired reminder and ordered by relevanceLevel 
-	 * @return
+	 * @return ListReminderType list of reminders 
 	 * @throws ParseException 
 	 */
 	@GET
@@ -148,14 +152,17 @@ public class PersonResource {
 	@Produces( MediaType.APPLICATION_JSON )
 	public ListReminderType visualizeReminder() throws ParseException {
 		System.out.println("visualizeReminder: Reading reminders for idPerson "+ this.idPerson +"...");
+		
+		//send and read request
 		Response response = service.path(path+"/reminder").request().accept(mediaType).get(Response.class);
 		System.out.println(response);
 		ListReminderType list = response.readEntity(ListReminderType.class);
-
+		
+		//iterates on the list of reminder and checks if they are expired
 		ListReminderType returnList = new ListReminderType();
 		if(list.getReminder().size() > 0){
 			for(ReminderType re : list.getReminder()){
-				System.out.println("sono qui");
+				//read a String and convert to Date
 				DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 				Date date = format.parse(re.getExpireReminder());
 				Date todayDate = Calendar.getInstance().getTime();
@@ -164,7 +171,8 @@ public class PersonResource {
 					returnList.getReminder().add(re);
 				}
 			}
-
+			
+			//sort the list of reminder based on the relevanceLevel 
 			Collections.sort(returnList.getReminder(), new Comparator<ReminderType>() {
 				@Override
 				public int compare(final ReminderType object1, final ReminderType object2) {
@@ -272,6 +280,8 @@ public class PersonResource {
 
 	/**
 	 * POST /person/{personId}/reminder
+	 * Insert a new reminder for person {personId}
+	 * @return 
 	 */
 	@POST
 	@Path("/reminder")
@@ -282,13 +292,16 @@ public class PersonResource {
 		Response response = service.path(path+"/reminder").request(mediaType)
 				.post(Entity.entity(reminder, mediaType), Response.class);
 		System.out.println(response);
-		return response;
+		
+		//TODO exception handler
+		return null;
 	}
 
 
 	//********************TARGET********************
 
 	/**
+	 * POST /person/{personId}/target/check
 	 * 	checkTarget(Measure) --> Boo
 	 */
 	@POST
@@ -304,7 +317,8 @@ public class PersonResource {
 
 	/**
 	 * GET /person/{personId}/target
-	 * Return list of target for person with id=personId	
+	 * Return list of target for person with id=personId
+	 * @return ListTargetType list of targets
 	 */
 	@GET
 	@Path("/target")
@@ -318,7 +332,7 @@ public class PersonResource {
 
 	/**
 	 * POST /person/{personId}/target
-	 *  
+	 * Insert a new target for person {personId} 
 	 */
 	@POST
 	@Path("/target")
@@ -329,7 +343,9 @@ public class PersonResource {
 		Response response = service.path(path+"/target").request(mediaType)
 				.post(Entity.entity(target, mediaType), Response.class);
 		System.out.println(response);
-		return response;	
+		
+		//TODO exception handler
+		return null;	
 	}
 
 }
