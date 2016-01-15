@@ -289,7 +289,7 @@ public class PersonResource {
     				.entity(externalErrorMessage(motivation_quote)).build();
          
          }else{
-        	 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MMM-dd");
+        	 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
              Calendar cal_created = Calendar.getInstance();
              //System.out.println(dateFormat.format(cal.getTime()));
              String date_created = dateFormat.format(cal_created.getTime());
@@ -315,6 +315,16 @@ public class PersonResource {
         	 quote_reminder.setExpireReminder(date_expired);
         	 quote_reminder.setRelevanceLevel(relevance);
         	 quote_reminder.setText(motivation_quote);
+        	 
+        	 
+        	 System.out.println("Create reminder: " + quote_reminder.getCreateReminder());
+        	 System.out.println("Expire reminder: " + quote_reminder.getExpireReminder());
+        	 System.out.println("Relevance reminder: " + quote_reminder.getRelevanceLevel());
+        	 System.out.println("text reminder: " + quote_reminder.getText());
+        	 System.out.println("Object quote_reminder: " + quote_reminder.toString());
+        	 
+        	 
+        	 
         	 insertNewReminder(quote_reminder);
         	 
         	 return Response.ok(motivation_quote).build();

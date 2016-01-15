@@ -2,6 +2,7 @@ package introsde.finalproject.rest.bls.resources;
 
 import java.lang.reflect.Executable;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.LocalBean;
@@ -94,8 +95,6 @@ visualizeDailyActivities(idUser) --> List, List, List
          }else{
         	 return Response.ok(y.getPerson().getMeasurements()).build();
          }
-		
-		
 		}catch(Exception e){
     		System.out.print("Error Cath motivation");
     		return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -108,13 +107,55 @@ visualizeDailyActivities(idUser) --> List, List, List
 	 * @return
 	 */
 	@GET
-	@Path("/person/{personId}/alarm")
+	@Path("/person/alarm")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ListMeasureType receiveAlarm(@PathParam("personId") String personId) {
-		System.out.println("receiveAlarm: Check Data from person id "+personId +"...");
-		
-		//TODO finire
-		return null;
+	public Response receiveAlarm() {
+		try{
+			Response response_family = service.path(path).request().accept(mediaType).get(Response.class);
+			System.out.println("Response family " + response_family );
+			FamilyType y = response_family.readEntity(FamilyType.class);
+			
+			if(response_family.getStatus() != 200){
+	        	System.out.println("BLS Error response_family.getStatus() != 200  ");
+	         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+	    				.entity(externalErrorMessage(y.getPerson().getMeasurements().toString())).build();
+	         }else{
+	        	 //System.out.println("getCurrentHealth: Reading CurrentHealth for idPerson "+ this.idPerson +"...");
+	        	 
+	        	 PersonType p = y.getPerson();
+	        	 p.getIdPerson();
+	        	 Response response_currentHealth = service.path("person/"+p.getIdPerson()+"/currentHealth").request().accept(mediaType).get(Response.class);
+	        	 ListMeasureType listCurrenthHealth = response_currentHealth.readEntity(ListMeasureType.class);
+	        	 List<MeasureType> listMeasures = listCurrenthHealth.getMeasure();
+	        	 int size = listMeasures.size();
+	        	 
+	        	 List<String> z = new ArrayList<String>();
+	        	 
+	        	 for(int b=0; b<listMeasures.size();b++){
+	        		 z.add(listMeasures.get(b).getMeasureDefinition().getIdMeasureDef().toString());
+	        		 z.add(listMeasures.get(b).getValue());
+	        		 
+	        	 }
+	        	 
+	        	 for(int c=0; c<z.size();c++){
+	        		 System.out.println("Element: " + c + " contains - " + (z.get(c).toString()));
+	        	 }
+	        	 
+	        	 
+	        	 ListMeasureType x = y.getPerson().getMeasurements();
+	        	 List<MeasureType> measureList = x.getMeasure();
+	        	 for(int i=0; i<measureList.size(); i++){
+	        		 System.out.println(measureList.get(i));
+	        	 }
+	        	 
+	        	 
+	        	 return Response.ok(y.getPerson().getMeasurements()).build();
+	         }
+			}catch(Exception e){
+	    		System.out.print("Error Cath motivation");
+	    		return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+	    				.entity(errorMessage(e)).build();
+	    	}
 	}
     
 	/**
