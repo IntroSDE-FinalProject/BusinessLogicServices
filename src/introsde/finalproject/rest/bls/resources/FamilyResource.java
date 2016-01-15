@@ -1,5 +1,7 @@
 package introsde.finalproject.rest.bls.resources;
 
+import java.lang.reflect.Executable;
+import java.math.BigInteger;
 import java.util.List;
 
 import javax.ejb.LocalBean;
@@ -23,6 +25,7 @@ import introsde.finalproject.rest.generated.DoctorType;
 import introsde.finalproject.rest.generated.FamilyType;
 import introsde.finalproject.rest.generated.ListMeasureType;
 import introsde.finalproject.rest.generated.MeasureType;
+import introsde.finalproject.rest.generated.PersonType;
 
 @Stateless // only used if the the application is deployed in a Java EE container
 @LocalBean // only used if the the application is deployed in a Java EE container
@@ -52,6 +55,19 @@ public class FamilyResource {
         this.path = "family/"+this.idFamily;
     }
     
+    
+    private String errorMessage(Exception e){
+    	return "{ \n \"error\" : \"Error in Business Logic Services, due to the exception: "+e+"\"}";
+    }
+	
+	private String externalErrorMessage(String e){
+    	return "{ \n \"error\" : \"Error in External services, due to the exception: "+e+"\"}";
+    }
+    
+	//Errors for objects
+	private String externalErrorMessageForObjects(Exception e,String obj){
+    	return "{ \n \"error\" : \"Error in External services, due to the exception: "+e+", for the object: "+obj+"\"}";
+    }
     /*
      * visualizeData(idUser)
 receiveAlarm(idUser) --> List
@@ -63,39 +79,28 @@ visualizeDailyActivities(idUser) --> List, List, List
 	 * @return
 	 */
 	@GET
-	@Path("/person/{personId}")
+	@Path("/person/measures")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ListMeasureType visualizeData() {
-		
-		
+	public Response visualizeData() {
+		try{
 		Response response_family = service.path(path).request().accept(mediaType).get(Response.class);
-		System.out.println("Response family" + response_family);
+		System.out.println("Response family " + response_family );
 		FamilyType y = response_family.readEntity(FamilyType.class);
 		
-		
-		List<MeasureType> familyList = y.getMeasure();
-		for(int i=0; i< familyList.size(); i++){
-			System.out.println(familyList.get(i).toString());
-		}
-		
-		//path /person/{personId}/measure to retrieve a list of measure for a person
-		String path_person_list = "person/"+personId+"/measure";
-		Response response_person_measure = service.path(path_person_list).request().accept(mediaType).get(Response.class);
-		System.out.println("Response " + response_person_measure);
-		
-		ListMeasureType x = response_person_measure.readEntity(ListMeasureType.class);
-		List<MeasureType> person_measure_list = x.getMeasure();
-		for(int i=0; i< person_measure_list.size(); i++){
-			System.out.println("List of person measure: " + person_measure_list.get(i).getMeasureDefinition());
-		}
+		if(response_family.getStatus() != 200){
+        	System.out.println("BLS Error response_family.getStatus() != 200  ");
+         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    				.entity(externalErrorMessage(y.getPerson().getMeasurements().toString())).build();
+         }else{
+        	 return Response.ok(y.getPerson().getMeasurements()).build();
+         }
 		
 		
-		
-		
-		
-		
-		
-		return null;
+		}catch(Exception e){
+    		System.out.print("Error Cath motivation");
+    		return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    				.entity(errorMessage(e)).build();
+    	}
 	}
     
 	/**
