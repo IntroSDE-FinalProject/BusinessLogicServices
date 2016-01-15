@@ -22,6 +22,8 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.json.JSONObject;
+
 import introsde.finalproject.rest.generated.DoctorType;
 import introsde.finalproject.rest.generated.FamilyType;
 import introsde.finalproject.rest.generated.ListMeasureType;
@@ -129,27 +131,81 @@ visualizeDailyActivities(idUser) --> List, List, List
 	        	 List<MeasureType> listMeasures = listCurrenthHealth.getMeasure();
 	        	 int size = listMeasures.size();
 	        	 
-	        	 List<String> z = new ArrayList<String>();
+	        	 List<Integer> z = new ArrayList<Integer>();
+	        	 
+	        	 int idMeasureDefinition;
+	        	 int value;
+	        	 boolean min_good = false;
+	        	 boolean max_good = false;
+	        	 String min_message = "";
+	        	 String max_message = "";
 	        	 
 	        	 for(int b=0; b<listMeasures.size();b++){
-	        		 z.add(listMeasures.get(b).getMeasureDefinition().getIdMeasureDef().toString());
-	        		 z.add(listMeasures.get(b).getValue());
-	        		 
+	        		 idMeasureDefinition = listMeasures.get(b).getMeasureDefinition().getIdMeasureDef().intValue();
+	        		 value =  Integer.parseInt(listMeasures.get(b).getValue());
+	        		 if(idMeasureDefinition == 4 || idMeasureDefinition == 5){
+	        		 if(idMeasureDefinition == 4 && value > 90){
+	        			 System.out.println("Blood pressure min too hight..." + value);
+	        			 z.add(value);
+	        			 min_good = false;
+	        			 min_message = "blood pressure min too hight...";
+	        		 }if(idMeasureDefinition == 4 && value < 60){
+	        			 System.out.println("Blood pressure min too low: " + value);
+	        			 z.add(value);
+	        			 min_good = false;
+	        			 min_message = "blood pressure min too low...";
+	        		 }if(idMeasureDefinition == 4 && (value > 60 && value < 90) ){
+	        			 System.out.println("Blood pressure min is perfect: " + value);
+	        			 z.add(value);
+	        			 min_good = true;
+	        			 min_message = "blood pressure min is perfect...";
+	        		 }if(idMeasureDefinition == 5 && value > 130){
+	        			 System.out.println("Blood pressure max too hight: " + value);
+	        			 z.add(value);
+	        			 max_good = false;
+	        			 max_message = "blood pressure max too hight...";
+	        		 }if(idMeasureDefinition == 5 && value < 80){
+	        			 System.out.println("Blood pressure max too low: " + value);
+	        			 z.add(value);
+	        			 max_good = false;
+	        			 max_message = "lood pressure max too low...";
+	        		 }if(idMeasureDefinition == 5 && (value > 80 && value < 130) ){
+	        			 System.out.println("Blood pressure max is perfect..." + value);
+	        			 z.add(value);
+	        			 max_good = true;
+	        			 max_message = "blood pressure max is perfect...";
+	        		 }
+	        		 } 
 	        	 }
 	        	 
-	        	 for(int c=0; c<z.size();c++){
-	        		 System.out.println("Element: " + c + " contains - " + (z.get(c).toString()));
+	        	 int min = z.get(0);
+	        	 int max = z.get(1);
+	        	 String pressure_message;
+	        	 if(!min_good && !max_good){
+	        		 pressure_message = "The blood pressure of assisted is good !!! " + min_message + " " + max_message;
+	        		 System.out.println("The blood pressure is good... !!!" + min_message);
+	        	 }else{
+	        		 pressure_message = "The blood pressure is not good... !!!" + min_message + " " + max_message;
+	        		 System.out.println("The blood pressure is not good... !!!");
 	        	 }
 	        	 
 	        	 
+	        	 JSONObject message_alarm = new JSONObject();
+	        	 message_alarm.put("Blood pressure min", min);
+	        	 message_alarm.put("Blood pressure max", max);
+	        	 message_alarm.put("Message",pressure_message);
+	        	 
+	        	 
+	        	 /*
 	        	 ListMeasureType x = y.getPerson().getMeasurements();
 	        	 List<MeasureType> measureList = x.getMeasure();
 	        	 for(int i=0; i<measureList.size(); i++){
 	        		 System.out.println(measureList.get(i));
 	        	 }
+	        	 */
 	        	 
-	        	 
-	        	 return Response.ok(y.getPerson().getMeasurements()).build();
+	        	 //return Response.ok(y.getPerson().getMeasurements()).build();
+	        	 return Response.ok(message_alarm.toString()).build();
 	         }
 			}catch(Exception e){
 	    		System.out.print("Error Cath motivation");
