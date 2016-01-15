@@ -45,6 +45,16 @@ public class DoctorResource {
         this.path = "doctor/"+this.idDoctor;
     }
 
+    private String errorMessage(Exception e){
+    	return "{ \n \"error\" : \"Error in Business Logic Services, due to the exception: "+e+"\"}";
+    }
+	
+	private String externalErrorMessage(String e){
+    	return "{ \n \"error\" : \"Error in External services, due to the exception: "+e+"\"}";
+    }
+    
+   
+    
     
     /**
 	 * GET /doctor/{doctorId}
@@ -53,11 +63,27 @@ public class DoctorResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public DoctorType readDoctor() {
+	public Response readDoctor() {
+		try{
 		System.out.println("readDoctor: Reading Doctor id "+this.idDoctor +"...");
 		Response response = service.path(path).request().accept(mediaType).get(Response.class);
+		
 		DoctorType doctor = response.readEntity(DoctorType.class);
-		return doctor;
+		
+		if(response.getStatus() != 200){
+	    	System.out.println("SS Error response.getStatus() != 200  ");
+	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(externalErrorMessage(doctor.toString())).build();
+	     
+	     }else{
+	    	 return Response.ok(doctor.toString()).build();
+	     }
+	    }catch(Exception e){
+	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
+	    	return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			.entity(errorMessage(e)).build();
+	    }
+		
 	}
     
 	/**
@@ -66,10 +92,24 @@ public class DoctorResource {
 	 */
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	public void deletePerson() {
+	public Response deletePerson() {
+		try{
 		System.out.println("deteteDoctor: Deleting doctor with id: "+ this.idDoctor);
 		Response response = service.path(path).request(mediaType).delete(Response.class);
-		System.out.println(response);
+		
+		if(response.getStatus() != 200){
+	    	System.out.println("SS Error response.getStatus() != 200  ");
+	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(externalErrorMessage(response.toString())).build();
+	     }else{
+	    	 return Response.ok(response.toString()).build();
+	     }
+	    }catch(Exception e){
+	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
+	    	return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			.entity(errorMessage(e)).build();
+	    }
+	
 	}
     
 	/**
@@ -81,10 +121,23 @@ public class DoctorResource {
 	@GET
 	@Path("/patients")
 	@Produces( MediaType.APPLICATION_JSON )
-	public ListPersonType getPatientList() {
+	public Response getPatientList() {
+		try{
 		System.out.println("getPatientList: Reading list of patients for Doctor "+ this.idDoctor +"...");
 		Response response = service.path(path+"/patients").request().accept(mediaType).get(Response.class);
-		System.out.println(response);
-		return response.readEntity(ListPersonType.class);
+		//System.out.println(response);
+		
+		if(response.getStatus() != 200){
+	    	System.out.println("SS Error response.getStatus() != 200  ");
+	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(externalErrorMessage(response.toString())).build();
+	     }else{
+	    	 return Response.ok(response.toString()).build();
+	     }
+	    }catch(Exception e){
+	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
+	    	return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			.entity(errorMessage(e)).build();
+	    }
 	}
 }
