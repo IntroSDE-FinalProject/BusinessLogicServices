@@ -71,15 +71,14 @@ public class FamilyResource {
 	private String externalErrorMessageForObjects(Exception e,String obj){
     	return "{ \n \"error\" : \"Error in External services, due to the exception: "+e+", for the object: "+obj+"\"}";
     }
-    /*
-     * visualizeData(idUser)
-receiveAlarm(idUser) --> List
-visualizeDailyActivities(idUser) --> List, List, List 
-     */
+   
     
     /**
+     * This method is used to get the measures of the user
+     * assisted by the family member.
+     * 
 	 * GET /family/{familyId}/person/{personId}
-	 * @return
+	 * @return list of measurements
 	 */
 	@GET
 	@Path("/person/measures")
@@ -105,8 +104,14 @@ visualizeDailyActivities(idUser) --> List, List, List
 	}
     
 	/**
+	 * This method is used to check the alarm of the assisted person.
+	 * In particular is checked the blood pressure reading the currentHealth of the
+	 * person.
+	 * 
+	 * 
 	 * GET /family/{familyId}/person/{personId}/alarm
-	 * @return
+	 * @return information about blood pressure if exists otherwise a message telling that there are not 
+	 * blood pressure measures to check
 	 */
 	@GET
 	@Path("/person/alarm")
@@ -154,7 +159,7 @@ visualizeDailyActivities(idUser) --> List, List, List
 	        			 z.add(value);
 	        			 min_good = false;
 	        			 min_message = "blood pressure min too low...";
-	        		 }if(idMeasureDefinition == 4 && (value > 60 && value < 90) ){
+	        		 }if(idMeasureDefinition == 4 && (value >= 60 && value <= 90) ){
 	        			 System.out.println("Blood pressure min is perfect: " + value);
 	        			 z.add(value);
 	        			 min_good = true;
@@ -168,8 +173,8 @@ visualizeDailyActivities(idUser) --> List, List, List
 	        			 System.out.println("Blood pressure max too low: " + value);
 	        			 z.add(value);
 	        			 max_good = false;
-	        			 max_message = "lood pressure max too low...";
-	        		 }if(idMeasureDefinition == 5 && (value > 80 && value < 130) ){
+	        			 max_message = "blood pressure max too low...";
+	        		 }if(idMeasureDefinition == 5 && (value >= 80 && value <= 130) ){
 	        			 System.out.println("Blood pressure max is perfect..." + value);
 	        			 z.add(value);
 	        			 max_good = true;
@@ -177,35 +182,38 @@ visualizeDailyActivities(idUser) --> List, List, List
 	        		 }
 	        		 } 
 	        	 }
-	        	 
-	        	 int min = z.get(0);
-	        	 int max = z.get(1);
-	        	 String pressure_message;
-	        	 if(!min_good && !max_good){
-	        		 pressure_message = "The blood pressure of assisted is good !!! " + min_message + " " + max_message;
-	        		 System.out.println("The blood pressure is good... !!!" + min_message);
+	        	 if(!z.isEmpty()){
+	        		 int min = z.get(0);
+		        	 int max = z.get(1);
+		        	 String pressure_message;
+		        	 if(min_good && max_good){
+		        		 pressure_message = "The blood pressure of assisted is good !!! " + min_message + " " + max_message;
+		        		 System.out.println("The blood pressure is good... !!!" + min_message);
+		        	 }else{
+		        		 pressure_message = "The blood pressure is not good... !!!" + min_message + " " + max_message;
+		        		 System.out.println("The blood pressure is not good... !!!");
+		        	 }
+		        	 
+		        	 JSONObject message_alarm = new JSONObject();
+		        	 message_alarm.put("Blood pressure min", min);
+		        	 message_alarm.put("Blood pressure max", max);
+		        	 message_alarm.put("Message",pressure_message);
+		      
+		        	 /*
+		        	 ListMeasureType x = y.getPerson().getMeasurements();
+		        	 List<MeasureType> measureList = x.getMeasure();
+		        	 for(int i=0; i<measureList.size(); i++){
+		        		 System.out.println(measureList.get(i));
+		        	 }
+		        	 */
+		        	 
+		        	 //return Response.ok(y.getPerson().getMeasurements()).build();
+		        	 return Response.ok(message_alarm.toString()).build();
 	        	 }else{
-	        		 pressure_message = "The blood pressure is not good... !!!" + min_message + " " + max_message;
-	        		 System.out.println("The blood pressure is not good... !!!");
+	        		 JSONObject noBloodPressureMeasure = new JSONObject();
+	        		 noBloodPressureMeasure.put("Alarm: ", "There are not blood measure inserted... ");
+	        		 return Response.ok(noBloodPressureMeasure.toString()).build(); 
 	        	 }
-	        	 
-	        	 
-	        	 JSONObject message_alarm = new JSONObject();
-	        	 message_alarm.put("Blood pressure min", min);
-	        	 message_alarm.put("Blood pressure max", max);
-	        	 message_alarm.put("Message",pressure_message);
-	        	 
-	        	 
-	        	 /*
-	        	 ListMeasureType x = y.getPerson().getMeasurements();
-	        	 List<MeasureType> measureList = x.getMeasure();
-	        	 for(int i=0; i<measureList.size(); i++){
-	        		 System.out.println(measureList.get(i));
-	        	 }
-	        	 */
-	        	 
-	        	 //return Response.ok(y.getPerson().getMeasurements()).build();
-	        	 return Response.ok(message_alarm.toString()).build();
 	         }
 			}catch(Exception e){
 	    		System.out.print("Error Cath motivation");
@@ -214,17 +222,5 @@ visualizeDailyActivities(idUser) --> List, List, List
 	    	}
 	}
     
-	/**
-	 * GET /family/{familyId}/person/{personId}/activities
-	 * @return
-	 */
-	@GET
-	@Path("/person/{personId}/activities")
-	@Produces(MediaType.APPLICATION_JSON)
-	public ListMeasureType visualizeDailyActivities(@PathParam("personId") String personId) {
-		
-		
-		//TODO finire
-		return null;
-	}
+	
 }
