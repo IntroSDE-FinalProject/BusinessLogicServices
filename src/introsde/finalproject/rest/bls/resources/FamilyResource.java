@@ -21,6 +21,7 @@ import javax.ws.rs.core.UriInfo;
 
 import introsde.finalproject.rest.generated.DoctorType;
 import introsde.finalproject.rest.generated.ListMeasureType;
+import introsde.finalproject.rest.generated.MeasureType;
 
 @Stateless // only used if the the application is deployed in a Java EE container
 @LocalBean // only used if the the application is deployed in a Java EE container
@@ -47,7 +48,7 @@ public class FamilyResource {
         this.idFamily = id;
         this.service = service;
         this.mediaType = mediatype;
-        this.path = "doctor/"+this.idFamily;
+        this.path = "family/"+this.idFamily;
     }
     
     /*
@@ -63,10 +64,34 @@ visualizeDailyActivities(idUser) --> List, List, List
 	@GET
 	@Path("/person/{personId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ListMeasureType visualizeData(@PathParam("personId") String personId) {
-		System.out.println("visualizeData: Reading Data from person id "+personId +"...");
+	public ListMeasureType visualizeData() {
 		
-		//TODO finire
+		
+		Response response_family = service.path(path).request().accept(mediaType).get(Response.class);
+		System.out.println("Response family" + response_family);
+		ListMeasureType y = response_family.readEntity(ListMeasureType.class);
+		List<MeasureType> familyList = y.getMeasure();
+		for(int i=0; i< familyList.size(); i++){
+			System.out.println(familyList.get(i).toString());
+		}
+		
+		//path /person/{personId}/measure to retrieve a list of measure for a person
+		String path_person_list = "person/"+personId+"/measure";
+		Response response_person_measure = service.path(path_person_list).request().accept(mediaType).get(Response.class);
+		System.out.println("Response " + response_person_measure);
+		
+		ListMeasureType x = response_person_measure.readEntity(ListMeasureType.class);
+		List<MeasureType> person_measure_list = x.getMeasure();
+		for(int i=0; i< person_measure_list.size(); i++){
+			System.out.println("List of person measure: " + person_measure_list.get(i).getMeasureDefinition());
+		}
+		
+		
+		
+		
+		
+		
+		
 		return null;
 	}
     
