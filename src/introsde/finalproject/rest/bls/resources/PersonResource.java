@@ -651,4 +651,46 @@ public class PersonResource {
 		System.out.println(response);
 		return response.readEntity(ListTargetType.class);
 	}
+	
+	
+	
+	
+	/**
+	 * GET /person/{personId}/target/{measureDefinitionId}/{value}
+	 * Return list of target for person with id = personId and
+	 * referring to measureDefinition = measureDefId
+	 * @return ListTargetType list of targets
+	 */
+	@GET
+	@Path("/check/{measureDefId}/{value}")
+	@Produces( MediaType.APPLICATION_JSON )
+	public Boolean checkVitalSigns(@PathParam("measureDefId") int measureDefId,@PathParam("value") int value,@PathParam("endValue") int endValue,
+			@PathParam("startValue") int startValue ){
+		System.out.println("readTargetsByMeasureDef: Reading targets for idPerson "+ this.idPerson +"...");
+		//Response response = service.path(path+"/target/"+measureDefId).request().accept(mediaType).get(Response.class);
+		//System.out.println(response);
+		boolean check = false;
+		int idMeasureDef = measureDefId;
+		int value_measure = value;
+		int end_value = endValue;
+		int start_value = value;
+		
+		System.out.println("idMeasureDef: " + idMeasureDef );
+		System.out.println("value_measure: " + value_measure );
+		System.out.println("endValue: " + end_value );
+		System.out.println("value_measure: " + start_value );
+		
+		if(value_measure >= start_value && value_measure <= end_value){
+			return check = true;			
+		}else{
+			return check;
+		}
+		
+	}
+	
+	
+	
+	
+	
+	
 }
