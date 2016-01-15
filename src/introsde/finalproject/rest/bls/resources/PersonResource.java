@@ -656,13 +656,13 @@ public class PersonResource {
 	
 	
 	/**
-	 * GET /person/{personId}/target/{measureDefinitionId}/{value}
+	 * GET /person/{personId}/target/{measureDefinitionId}/{value}/{endValue}/{startValue}
 	 * Return list of target for person with id = personId and
 	 * referring to measureDefinition = measureDefId
 	 * @return ListTargetType list of targets
 	 */
 	@GET
-	@Path("/check/{measureDefId}/{value}")
+	@Path("/check/{measureDefId}/{value}/{endValue}/{startValue}")
 	@Produces( MediaType.APPLICATION_JSON )
 	public Boolean checkVitalSigns(@PathParam("measureDefId") int measureDefId,@PathParam("value") int value,@PathParam("endValue") int endValue,
 			@PathParam("startValue") int startValue ){
