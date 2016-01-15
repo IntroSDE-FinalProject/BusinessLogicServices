@@ -102,15 +102,22 @@ public class PersonResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public PersonType readPerson() {
+	public Response readPerson() {
+		try{
 		System.out.println("readPerson: Reading Person...");
 		Response response = service.path(path).request().accept(mediaType).get(Response.class);
-		if (response.getStatus() == 200 || response.getStatus() == 202) {
-			PersonType u = response.readEntity(PersonType.class);
-			return u;
-		}else{
-			return null;
-		}
+		if(response.getStatus() != 200){
+	    	System.out.println("SS Error response.getStatus() != 200  ");
+	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(externalErrorMessage(response.toString())).build();
+	     }else{
+	    	 return Response.ok(response.toString()).build();
+	     }
+	    }catch(Exception e){
+	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
+	    	return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			.entity(errorMessage(e)).build();
+	    }
 	}
 
 	/**
@@ -119,10 +126,23 @@ public class PersonResource {
 	 */
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	public void deletePerson() {
+	public Response deletePerson() {
+		try{
 		System.out.println("detetePerson: Deleting person with id: "+ this.idPerson);
 		Response response = service.path(path).request(mediaType).delete(Response.class);
 		System.out.println(response);
+		if(response.getStatus() != 200){
+	    	System.out.println("SS Error response.getStatus() != 200  ");
+	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(externalErrorMessage(response.toString())).build();
+	     }else{
+	    	 return Response.ok(response.toString()).build();
+	     }
+	    }catch(Exception e){
+	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
+	    	return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			.entity(errorMessage(e)).build();
+	    }
 	}
 
 	//********************MEASURE********************
@@ -135,11 +155,23 @@ public class PersonResource {
 	@GET
 	@Path("/currentHealth")
 	@Produces( MediaType.APPLICATION_JSON )
-	public ListMeasureType getCurrentHealth() {
+	public Response getCurrentHealth() {
+		try{
 		System.out.println("getCurrentHealth: Reading CurrentHealth for idPerson "+ this.idPerson +"...");
 		Response response = service.path(path+"/currentHealth").request().accept(mediaType).get(Response.class);
 		System.out.println(response);
-		return response.readEntity(ListMeasureType.class);
+		if(response.getStatus() != 200){
+	    	System.out.println("SS Error response.getStatus() != 200  ");
+	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(externalErrorMessage(response.toString())).build();
+	     }else{
+	    	 return Response.ok(response.toString()).build();
+	     }
+	    }catch(Exception e){
+	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
+	    	return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			.entity(errorMessage(e)).build();
+	    }
 	}
 
 	/**
@@ -150,11 +182,24 @@ public class PersonResource {
 	@GET
 	@Path("/measure")
 	@Produces( MediaType.APPLICATION_JSON )
-	public ListMeasureType visualizeMeasure() {
+	public Response visualizeMeasure() {
+		try{
 		System.out.println("visualizeMeasure: Reading Measures for idPerson "+ this.idPerson +"...");
 		Response response = service.path(path+"/measure").request().accept(mediaType).get(Response.class);
 		System.out.println(response);
-		return response.readEntity(ListMeasureType.class);
+		if(response.getStatus() != 200){
+	    	System.out.println("SS Error response.getStatus() != 200  ");
+	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(externalErrorMessage(response.toString())).build();
+	     }else{
+	    	 return Response.ok(response.toString()).build();
+	     }
+	    }catch(Exception e){
+	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
+	    	return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			.entity(errorMessage(e)).build();
+	    }
+		
 	}
 	
 	/**
@@ -241,6 +286,7 @@ public class PersonResource {
 		System.out.println(response);
 		ListReminderType list = response.readEntity(ListReminderType.class);
 		
+		
 		//iterates on the list of reminder and checks if they are expired
 		ListReminderType returnList = new ListReminderType();
 		if(list.getReminder().size() > 0){
@@ -258,6 +304,8 @@ public class PersonResource {
 					return object1.getRelevanceLevel().compareTo(object2.getRelevanceLevel());
 				}
 			} );
+			
+			
 			return returnList;
 		} else
 			return returnList;
@@ -496,12 +544,6 @@ public class PersonResource {
         
     }
 	
-	
-	
-	
-	
-	
-
 	/**
 	 * POST /person/{personId}/reminder
 	 * Insert a new reminder for person {personId}
@@ -512,13 +554,25 @@ public class PersonResource {
 	@Produces( MediaType.APPLICATION_JSON )
 	@Consumes({MediaType.APPLICATION_JSON ,  MediaType.APPLICATION_XML})
 	public Response insertNewReminder(ReminderType reminder){
+		try{
 		System.out.println("insert New Reminder for person "+ this.idPerson);
 		Response response = service.path(path+"/reminder").request(mediaType)
 				.post(Entity.entity(reminder, mediaType), Response.class);
 		System.out.println(response);
 		
-		//TODO exception handler
-		return null;
+		if(response.getStatus() != 200){
+	    	System.out.println("SS Error response.getStatus() != 200  ");
+	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(externalErrorMessage(response.toString())).build();
+	     }else{
+	    	 return Response.ok(response.toString()).build();
+	     }
+	    }catch(Exception e){
+	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
+	    	return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			.entity(errorMessage(e)).build();
+	    }
+		
 	}
 
 
@@ -532,11 +586,23 @@ public class PersonResource {
 	@GET
 	@Path("/target")
 	@Produces( MediaType.APPLICATION_JSON )
-	public ListTargetType readTargets() {
+	public Response readTargets() {
+		try{
 		System.out.println("readTargets: Reading targets for idPerson "+ this.idPerson +"...");
 		Response response = service.path(path+"/target").request().accept(mediaType).get(Response.class);
 		System.out.println(response);
-		return response.readEntity(ListTargetType.class);
+		if(response.getStatus() != 200){
+	    	System.out.println("SS Error response.getStatus() != 200  ");
+	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(externalErrorMessage(response.toString())).build();
+	     }else{
+	    	 return Response.ok(response.toString()).build();
+	     }
+	    }catch(Exception e){
+	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
+	    	return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			.entity(errorMessage(e)).build();
+	    }
 	}
 
 	/**
@@ -548,13 +614,25 @@ public class PersonResource {
 	@Produces( MediaType.TEXT_PLAIN )
 	@Consumes({MediaType.APPLICATION_JSON ,  MediaType.APPLICATION_XML})
 	public Response insertNewTarget(TargetType target){
+		try{
 		System.out.println("insertNewTarget: New Target... ");
 		Response response = service.path(path+"/target").request(mediaType)
 				.post(Entity.entity(target, mediaType), Response.class);
 		System.out.println(response);
 		
-		//TODO exception handler
-		return null;	
+		if(response.getStatus() != 200){
+	    	System.out.println("SS Error response.getStatus() != 200  ");
+	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(externalErrorMessage(response.toString())).build();
+	     }else{
+	    	 return Response.ok(response.toString()).build();
+	     }
+	    }catch(Exception e){
+	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
+	    	return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			.entity(errorMessage(e)).build();
+	    }
+			
 	}
 	
 
@@ -567,7 +645,7 @@ public class PersonResource {
 	@GET
 	@Path("/target/{measureDefId}")
 	@Produces( MediaType.APPLICATION_JSON )
-	public ListTargetType readTargetsByMeasureDef(@PathParam("measureDefId") BigInteger measureDefId) {
+	public ListTargetType readTargetsByMeasureDef(@PathParam("measureDefId") BigInteger measureDefId){
 		System.out.println("readTargetsByMeasureDef: Reading targets for idPerson "+ this.idPerson +"...");
 		Response response = service.path(path+"/target/"+measureDefId).request().accept(mediaType).get(Response.class);
 		System.out.println(response);
