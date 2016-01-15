@@ -88,7 +88,7 @@ public class CollectionResources {
 	 }
 	 
 	 /**
-	  * GET /measureDefinition
+	  * GET /measureDefinition?measure={MeasureDefId}
 	  * Return the measureDefinition object associated with a specific id
 	  * @return {@link MeasureDefinitionType} 
 	  */
@@ -100,12 +100,11 @@ public class CollectionResources {
 		 Response response = service.path("/measureDefinition").request().accept(mediaType).get(Response.class);
 		 System.out.println(response);
 		 ListMeasureDefinitionType ld = response.readEntity(ListMeasureDefinitionType.class);
-		 MeasureDefinitionType result = null;
 		 for(MeasureDefinitionType de : ld.getMeasureType()){
 			 if(de.getIdMeasureDef().compareTo(measureId) == 0){
-				 result = de;
+				 return de;
 			 }
 		 }
-		 return result;
+		 return null;
 	 }
 }

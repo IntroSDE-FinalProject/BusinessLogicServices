@@ -141,9 +141,28 @@ public class PersonResource {
 		System.out.println("visualizeMeasure: Reading Measures for idPerson "+ this.idPerson +"...");
 		Response response = service.path(path+"/measure").request().accept(mediaType).get(Response.class);
 		System.out.println(response);
-		//ListMeasureType x = response.readEntity(ListMeasureType.class);
-		//x.getMeasure().get(0).getTimestamp();
 		return response.readEntity(ListMeasureType.class);
+	}
+	
+	/**
+	 * GET /person/{personId}/measure/{measureId}
+	 * Return the measure with {measureId}
+	 * @return MeasureType a measure
+	 */
+	@GET
+	@Path("/measure/{measureId}")
+	@Produces( MediaType.APPLICATION_JSON )
+	public MeasureType getMeasureById(@PathParam("measureId") BigInteger measureId) {
+		System.out.println("getMeasureById: Reading Measures for idPerson "+ this.idPerson +"...");
+		Response response = service.path(path+"/measure").request().accept(mediaType).get(Response.class);
+		System.out.println(response);
+		ListMeasureType lMeasure = response.readEntity(ListMeasureType.class);
+		 for(MeasureType m : lMeasure.getMeasure()){
+			 if(m.getIdMeasure().compareTo(measureId) == 0){
+				 return m; 
+			 }
+		 }
+		 return null;
 	}
 
 	//***********************REMINDER***********************
