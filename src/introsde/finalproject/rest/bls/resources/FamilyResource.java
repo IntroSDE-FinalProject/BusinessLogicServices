@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import introsde.finalproject.rest.generated.DoctorType;
+import introsde.finalproject.rest.generated.FamilyType;
 import introsde.finalproject.rest.generated.ListMeasureType;
 import introsde.finalproject.rest.generated.MeasureType;
 
@@ -69,7 +70,9 @@ visualizeDailyActivities(idUser) --> List, List, List
 		
 		Response response_family = service.path(path).request().accept(mediaType).get(Response.class);
 		System.out.println("Response family" + response_family);
-		ListMeasureType y = response_family.readEntity(ListMeasureType.class);
+		FamilyType y = response_family.readEntity(FamilyType.class);
+		
+		
 		List<MeasureType> familyList = y.getMeasure();
 		for(int i=0; i< familyList.size(); i++){
 			System.out.println(familyList.get(i).toString());
