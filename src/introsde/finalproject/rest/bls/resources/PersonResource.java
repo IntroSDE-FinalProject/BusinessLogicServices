@@ -187,7 +187,7 @@ public class PersonResource {
 	 */
 	@GET
 	@Path("/measure/{measureId}/check")
-	@Produces( MediaType.APPLICATION_JSON )
+	@Produces( MediaType.TEXT_PLAIN )
 	public Boolean checkMeasureWithTarget(@PathParam("measureId") BigInteger measureId) throws ParseException {
 		System.out.println("checkMeasureWithTarget: Checking measure "+ measureId +" for idPerson "+ this.idPerson +"...");
 		MeasureType measure = getMeasureById(measureId);
