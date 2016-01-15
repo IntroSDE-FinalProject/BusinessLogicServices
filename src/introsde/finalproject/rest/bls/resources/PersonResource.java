@@ -197,8 +197,10 @@ public class PersonResource {
 			for(TargetType target : listTargets.getTarget()){
 				int count = Integer.compare(Integer.parseInt(measure.getValue()), target.getValue());
 				String cond = target.getConditionTarget().replaceAll("\\s","");
-				//conditionTarget have to be set and the tar
-				if (target.getConditionTarget() != null && compareDateWithToday(target.getEndDateTarget()) >= 0) {
+				//conditionTarget is set and the target is not expired
+				if (target.getConditionTarget() != null && 
+						compareDateWithToday(target.getEndDateTarget()) >= 0 &&
+						target.isAchieved() == false) {
 					if( (cond.equals("<") && count <  0) || (cond.equals("<=") && count <= 0) ||
 						(cond.equals("=") && count == 0) || (cond.equals(">") && count > 0) ||
 						(cond.equals(">=") && count >= 0)){
