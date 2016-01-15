@@ -163,6 +163,47 @@ public class PersonResource {
 		 }
 		 return null;
 	}
+	
+	/**
+	 * GET /person/{personId}/measure/{measureId}/check
+	 *  
+	 * Check if the target is achieved for the measure passed as param
+	 * 
+	 */
+	@GET
+	@Path("/measure/{measureId}/check")
+	@Produces( MediaType.APPLICATION_JSON )
+	public Boolean checkMeasureWithTarget(@PathParam("measureId") BigInteger measureId) {
+		System.out.println("checkMeasureWithTarget: Checking measure "+ measureId +" for idPerson "+ this.idPerson +"...");
+		MeasureType measure = getMeasureById(measureId);
+		ListTargetType listTargets = readTargetsByMeasureDef(measure.getMeasureDefinition().getIdMeasureDef());
+		Boolean result = false;
+		if(listTargets.getTarget().size() > 0){
+			for(TargetType target : listTargets.getTarget()){
+				int count = Integer.compare(Integer.parseInt(measure.getValue()), target.getValue());
+				String cond = target.getConditionTarget().replaceAll("\\s","");
+				if (target.getConditionTarget() != null) {
+					if( (cond.equals("<") && count <  0) || (cond.equals("<=") && count <= 0) ||
+						(cond.equals("=") && count == 0) || (cond.equals(">") && count > 0) ||
+						(cond.equals(">=") && count >= 0)){
+						//TODO aggiungere controllo su data
+						target.setAchieved(true);
+						updateTarget(target);
+						result = true;
+					}else
+						result = false;
+				}
+			}
+		}
+		return result;
+	}
+
+	private Integer updateTarget(TargetType target) {
+		System.out.println("updateTarget: Update target "+ target.getIdTarget() +"...");
+		Response response = service.path(path+"/target/"+target.getIdTarget()).request().accept(mediaType).put(Entity.entity(target, mediaType)); ;
+		System.out.println(response);
+		return response.readEntity(Integer.class);		
+	}
 
 	//***********************REMINDER***********************
 
@@ -418,24 +459,6 @@ public class PersonResource {
 	//********************TARGET********************
 
 	/**
-	 * GET /person/{personId}/target/check
-	 * 	checkTarget(Measure) --> Boo
-	 * 
-	 * Check if the target is achieved for the measure passed as param
-	 * 
-	 */
-	@GET
-	@Path("/target/check")
-	@Produces( MediaType.APPLICATION_JSON )
-	public Boolean checkTarget() {
-		System.out.println("checkTarget: Checking targets for idPerson "+ this.idPerson +"...");
-
-		//TODO da fare
-
-		return null;
-	}
-
-	/**
 	 * GET /person/{personId}/target
 	 * Return list of target for person with id=personId
 	 * @return ListTargetType list of targets
@@ -444,7 +467,7 @@ public class PersonResource {
 	@Path("/target")
 	@Produces( MediaType.APPLICATION_JSON )
 	public ListTargetType readTargets() {
-		System.out.println("readTargets: Readind targets for idPerson "+ this.idPerson +"...");
+		System.out.println("readTargets: Reading targets for idPerson "+ this.idPerson +"...");
 		Response response = service.path(path+"/target").request().accept(mediaType).get(Response.class);
 		System.out.println(response);
 		return response.readEntity(ListTargetType.class);
@@ -467,5 +490,21 @@ public class PersonResource {
 		//TODO exception handler
 		return null;	
 	}
+	
 
+	/**
+	 * GET /person/{personId}/target/{measureDefinitionId}
+	 * Return list of target for person with id = personId and
+	 * referring to measureDefinition = measureDefId
+	 * @return ListTargetType list of targets
+	 */
+	@GET
+	@Path("/target/{measureDefId}")
+	@Produces( MediaType.APPLICATION_JSON )
+	public ListTargetType readTargetsByMeasureDef(@PathParam("measureDefId") BigInteger measureDefId) {
+		System.out.println("readTargetsByMeasureDef: Reading targets for idPerson "+ this.idPerson +"...");
+		Response response = service.path(path+"/target/"+measureDefId).request().accept(mediaType).get(Response.class);
+		System.out.println(response);
+		return response.readEntity(ListTargetType.class);
+	}
 }
