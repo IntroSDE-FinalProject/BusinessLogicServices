@@ -78,6 +78,19 @@ public class PersonResource {
     	return "{ \n \"error\" : \"Error in External services, due to the exception: "+e+"\"}";
     }
 	
+	/**
+	 * 
+	 * @param input
+	 * @return -1 if input before today, 0 if input equals today , 1 if input after today
+	 * @throws ParseException
+	 */
+	private int compareDateWithToday(String input) throws ParseException{
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Date date = format.parse(input);
+		Date todayDate = Calendar.getInstance().getTime();
+		System.out.println("Compare date: "+input+" with today: "+todayDate+" = "+date.compareTo(todayDate));
+		return date.compareTo(todayDate);
+	}
 
 	//********************PERSON********************
 
@@ -168,12 +181,13 @@ public class PersonResource {
 	 * GET /person/{personId}/measure/{measureId}/check
 	 *  
 	 * Check if the target is achieved for the measure passed as param
+	 * @throws ParseException 
 	 * 
 	 */
 	@GET
 	@Path("/measure/{measureId}/check")
 	@Produces( MediaType.APPLICATION_JSON )
-	public Boolean checkMeasureWithTarget(@PathParam("measureId") BigInteger measureId) {
+	public Boolean checkMeasureWithTarget(@PathParam("measureId") BigInteger measureId) throws ParseException {
 		System.out.println("checkMeasureWithTarget: Checking measure "+ measureId +" for idPerson "+ this.idPerson +"...");
 		MeasureType measure = getMeasureById(measureId);
 		ListTargetType listTargets = readTargetsByMeasureDef(measure.getMeasureDefinition().getIdMeasureDef());
@@ -182,11 +196,11 @@ public class PersonResource {
 			for(TargetType target : listTargets.getTarget()){
 				int count = Integer.compare(Integer.parseInt(measure.getValue()), target.getValue());
 				String cond = target.getConditionTarget().replaceAll("\\s","");
-				if (target.getConditionTarget() != null) {
+				//conditionTarget have to be set and the tar
+				if (target.getConditionTarget() != null && compareDateWithToday(target.getEndDateTarget()) >= 0) {
 					if( (cond.equals("<") && count <  0) || (cond.equals("<=") && count <= 0) ||
 						(cond.equals("=") && count == 0) || (cond.equals(">") && count > 0) ||
 						(cond.equals(">=") && count >= 0)){
-						//TODO aggiungere controllo su data
 						target.setAchieved(true);
 						updateTarget(target);
 						result = true;
@@ -228,12 +242,8 @@ public class PersonResource {
 		ListReminderType returnList = new ListReminderType();
 		if(list.getReminder().size() > 0){
 			for(ReminderType re : list.getReminder()){
-				//read a String and convert to Date
-				DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-				Date date = format.parse(re.getExpireReminder());
-				Date todayDate = Calendar.getInstance().getTime();
-				System.out.println(date.compareTo(todayDate));
-				if ( date.compareTo(todayDate) >= 0 ){
+				//check if the reminder is expired
+				if ( this.compareDateWithToday(re.getExpireReminder()) >= 0 ){
 					returnList.getReminder().add(re);
 				}
 			}
