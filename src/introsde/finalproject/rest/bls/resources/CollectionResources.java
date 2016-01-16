@@ -130,8 +130,8 @@ public class CollectionResources {
 	@GET
 	@Path("/measureDefinition")
 	@Produces( MediaType.APPLICATION_JSON )
-	public MeasureDefinitionType readTargets(@QueryParam("measure") BigInteger measureId) {
-		System.out.println("readTargets: Readind Measure Definition");
+	public MeasureDefinitionType readMeasureDefinition(@QueryParam("measure") BigInteger measureId) {
+		System.out.println("readMeasureDefinition: Readind Measure Definition");
 		Response response = service.path("/measureDefinition").request().accept(mediaType).get(Response.class);
 		System.out.println(response);
 		ListMeasureDefinitionType ld = response.readEntity(ListMeasureDefinitionType.class);
