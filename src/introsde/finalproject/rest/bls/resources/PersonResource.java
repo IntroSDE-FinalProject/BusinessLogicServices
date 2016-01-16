@@ -561,7 +561,7 @@ public class PersonResource {
 				.post(Entity.entity(reminder, mediaType), Response.class);
 		System.out.println(response);
 		
-		if(response.getStatus() != 200){
+		if(response.getStatus() != 201){
 	    	System.out.println("SS Error response.getStatus() != 200  ");
 	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(externalErrorMessage(response.toString())).build();
