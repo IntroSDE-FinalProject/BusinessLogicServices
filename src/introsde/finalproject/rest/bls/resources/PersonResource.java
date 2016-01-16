@@ -6,13 +6,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
-
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
@@ -136,7 +133,7 @@ public class PersonResource {
 	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(externalErrorMessage(response.toString())).build();
 	     }else{
-	    	 return Response.ok(response.toString()).build();
+	    	 return Response.ok(response.readEntity(String.class)).build();
 	     }
 	    }catch(Exception e){
 	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
@@ -193,7 +190,8 @@ public class PersonResource {
 	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(externalErrorMessage(response.toString())).build();
 	     }else{
-	    	 return Response.ok(response.toString()).build();
+	    	 ListMeasureType x = response.readEntity(ListMeasureType.class);
+	    	 return Response.ok(x).build();
 	     }
 	    }catch(Exception e){
 	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
@@ -598,7 +596,7 @@ public class PersonResource {
 	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(externalErrorMessage(response.toString())).build();
 	     }else{
-	    	 return Response.ok(response.toString()).build();
+	    	 return Response.ok(response.readEntity(TargetType.class)).build();
 	     }
 	    }catch(Exception e){
 	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
@@ -627,7 +625,7 @@ public class PersonResource {
 	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(externalErrorMessage(response.toString())).build();
 	     }else{
-	    	 return Response.ok(response.toString()).build();
+	    	 return Response.ok(response.readEntity(String.class)).build();
 	     }
 	    }catch(Exception e){
 	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
@@ -689,10 +687,5 @@ public class PersonResource {
 		}
 		
 	}
-	
-	
-	
-	
-	
-	
+		
 }

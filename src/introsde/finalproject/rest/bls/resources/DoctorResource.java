@@ -14,7 +14,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import introsde.finalproject.rest.generated.DoctorType;
-import introsde.finalproject.rest.generated.ListMeasureType;
 import introsde.finalproject.rest.generated.ListPersonType;
 
 @Stateless // only used if the the application is deployed in a Java EE container
@@ -92,7 +91,7 @@ public class DoctorResource {
 	 */
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deletePerson() {
+	public Response deleteDoctor() {
 		try{
 		System.out.println("deteteDoctor: Deleting doctor with id: "+ this.idDoctor);
 		Response response = service.path(path).request(mediaType).delete(Response.class);
@@ -102,7 +101,7 @@ public class DoctorResource {
 	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(externalErrorMessage(response.toString())).build();
 	     }else{
-	    	 return Response.ok(response.toString()).build();
+	    	 return Response.ok(response.readEntity(String.class)).build();
 	     }
 	    }catch(Exception e){
 	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
@@ -117,7 +116,6 @@ public class DoctorResource {
 	 * Returns the list of patients
 	 * @return ListPersonType list of person
 	 */
-	//TODO da provare
 	@GET
 	@Path("/patients")
 	@Produces( MediaType.APPLICATION_JSON )
@@ -125,14 +123,14 @@ public class DoctorResource {
 		try{
 		System.out.println("getPatientList: Reading list of patients for Doctor "+ this.idDoctor +"...");
 		Response response = service.path(path+"/patients").request().accept(mediaType).get(Response.class);
-		//System.out.println(response);
+		System.out.println(response);
 		
 		if(response.getStatus() != 200){
 	    	System.out.println("SS Error response.getStatus() != 200  ");
 	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(externalErrorMessage(response.toString())).build();
 	     }else{
-	    	 return Response.ok(response.toString()).build();
+	    	 return Response.ok(response.readEntity(ListPersonType.class)).build();
 	     }
 	    }catch(Exception e){
 	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
