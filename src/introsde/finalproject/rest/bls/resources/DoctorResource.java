@@ -75,7 +75,7 @@ public class DoctorResource {
 					.entity(externalErrorMessage(doctor.toString())).build();
 	     
 	     }else{
-	    	 return Response.ok(doctor.toString()).build();
+	    	 return Response.ok(doctor).build();
 	     }
 	    }catch(Exception e){
 	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
@@ -96,7 +96,7 @@ public class DoctorResource {
 		System.out.println("deteteDoctor: Deleting doctor with id: "+ this.idDoctor);
 		Response response = service.path(path).request(mediaType).delete(Response.class);
 		
-		if(response.getStatus() != 200){
+		if(response.getStatus() != 204){
 	    	System.out.println("SS Error response.getStatus() != 200  ");
 	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(externalErrorMessage(response.toString())).build();

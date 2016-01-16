@@ -16,7 +16,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -128,12 +127,12 @@ public class PersonResource {
 		System.out.println("detetePerson: Deleting person with id: "+ this.idPerson);
 		Response response = service.path(path).request(mediaType).delete(Response.class);
 		System.out.println(response);
-		if(response.getStatus() != 200){
+		if(response.getStatus() != 204){
 	    	System.out.println("SS Error response.getStatus() != 200  ");
 	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(externalErrorMessage(response.toString())).build();
 	     }else{
-	    	 return Response.ok(response.readEntity(String.class)).build();
+	    	 return Response.status(Response.Status.NO_CONTENT).build();
 	     }
 	    }catch(Exception e){
 	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
@@ -248,6 +247,7 @@ public class PersonResource {
 					if( (cond.equals("<") && count <  0) || (cond.equals("<=") && count <= 0) ||
 						(cond.equals("=") && count == 0) || (cond.equals(">") && count > 0) ||
 						(cond.equals(">=") && count >= 0)){
+						//the target is achieved
 						target.setAchieved(true);
 						updateTarget(target);
 						result = true;
@@ -312,7 +312,8 @@ public class PersonResource {
 
 
 	/**
-	 * GET /person/{personId}/suggestion
+	 * GET /person/{personId}/motivation
+	 * Get a motivation phrase and save it as reminder.
 	 * @return
 	 */
 	@GET
@@ -620,7 +621,7 @@ public class PersonResource {
 				.post(Entity.entity(target, mediaType), Response.class);
 		System.out.println(response);
 		
-		if(response.getStatus() != 200){
+		if(response.getStatus() != 201){
 	    	System.out.println("SS Error response.getStatus() != 200  ");
 	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(externalErrorMessage(response.toString())).build();
