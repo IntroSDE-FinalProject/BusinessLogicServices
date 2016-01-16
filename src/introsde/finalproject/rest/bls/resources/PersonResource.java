@@ -111,7 +111,7 @@ public class PersonResource {
 	     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(externalErrorMessage(response.toString())).build();
 	     }else{
-	    	 return Response.ok(response.toString()).build();
+	    	 return Response.ok(response.readEntity(PersonType.class)).build();
 	     }
 	    }catch(Exception e){
 	    	System.out.println("BLS Error catch response.getStatus() != 200  ");
