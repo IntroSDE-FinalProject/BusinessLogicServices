@@ -76,7 +76,7 @@ public class FamilyResource {
      * This method is used to get the measures of the user
      * assisted by the family member.
      * 
-	 * GET /family/{familyId}/person/{personId}
+	 * GET /family/{familyId}/person/measures
 	 * @return list of measurements
 	 */
 	@GET
