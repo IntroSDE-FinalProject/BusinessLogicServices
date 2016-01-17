@@ -551,7 +551,7 @@ public class PersonResource {
 	 */
 	@POST
 	@Path("/reminder")
-	@Produces( MediaType.APPLICATION_JSON )
+	@Produces( MediaType.TEXT_PLAIN )
 	@Consumes({MediaType.APPLICATION_JSON ,  MediaType.APPLICATION_XML})
 	public Response insertNewReminder(ReminderType reminder){
 		try{
