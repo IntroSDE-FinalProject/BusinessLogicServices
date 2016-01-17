@@ -556,6 +556,11 @@ public class PersonResource {
 	public Response insertNewReminder(ReminderType reminder){
 		try{
 		System.out.println("insert New Reminder for person "+ this.idPerson);
+		//set today date
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = Calendar.getInstance().getTime();
+        String date_created = dateFormat.format(date);
+		reminder.setCreateReminder(date_created);
 		Response response = service.path(path+"/reminder").request(mediaType)
 				.post(Entity.entity(reminder, mediaType), Response.class);
 		System.out.println(response);
